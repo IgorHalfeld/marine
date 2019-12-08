@@ -26,10 +26,10 @@ type Position struct {
 
 // Alert represents the marine struct data
 type Alert struct {
-	ImageURL    string `jsong:"image_url"`
-	Type        string `jsong:"type"`
-	Description string `jsong:"description"`
-	FingerPrint string `jsong:"finger_print"`
+	ImageURL    string `json:"image_url"`
+	Type        string `json:"type"`
+	Description string `json:"description"`
+	FingerPrint string `json:"finger_print"`
 	Lat         string `json:"lat"`
 	Lon         string `json:"lon"`
 	CreatedAt   string `json:"created_at"`

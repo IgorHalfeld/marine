@@ -91,7 +91,7 @@ func PostNewAlert(config *config.Config, w http.ResponseWriter, r *http.Request)
 		config.Logger.Error("Request NOT FOUND")
 		return
 	}
-	respondJSON(w, http.StatusOK, alert)
+	respondJSON(w, http.StatusOK, model.ResponseMessage{Message: "Alerta Enviado com Sucesso !!"})
 }
 
 // postNewAlertOr500 will post a new alert to the system
@@ -107,7 +107,7 @@ func postNewAlertOr500(firebase *firebase.App, url string, w http.ResponseWriter
 		return nil
 	}
 	alert.CreatedAt = time.Now().Format(time.RFC3339)
-	err = db.NewRef("alerts").Set(r.Context(), map[string]model.Alert{alert.CreatedAt: alert})
+	err = db.NewRef("alerts/"+alert.CreatedAt).Set(r.Context(), alert)
 	if err != nil {
 		respondError(w, http.StatusInternalServerError, err.Error())
 		return nil
