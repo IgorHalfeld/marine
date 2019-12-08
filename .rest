@@ -1,0 +1,19 @@
+GET http://localhost:8080/traffic HTTP/1.1
+
+###
+
+GET http://localhost:8080/general HTTP/1.1
+
+###
+
+POST http://localhost:8080/alert HTTP/1.1
+content-type: application/json
+
+{
+	"image_url": "1",
+	"type": "2",
+	"description": "3",
+	"finger_print": "4",
+	"lat": "5",
+	"lon": "6"
+}
