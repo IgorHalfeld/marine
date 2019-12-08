@@ -1,5 +1,7 @@
 package model
 
+import vision "google.golang.org/api/vision/v1"
+
 // MarineTraffic represents the marine struct data
 type MarineTraffic struct {
 	Extent    []float64  `json:"extent"`
@@ -26,13 +28,14 @@ type Position struct {
 
 // Alert represents the marine struct data
 type Alert struct {
-	ImageURL    string `json:"image_url"`
-	Type        string `json:"type"`
-	Description string `json:"description"`
-	FingerPrint string `json:"finger_print"`
-	Lat         string `json:"lat"`
-	Lon         string `json:"lon"`
-	CreatedAt   string `json:"created_at"`
+	ImageURL    string                     `json:"image_url"`
+	Type        string                     `json:"type"`
+	Description string                     `json:"description"`
+	FingerPrint string                     `json:"finger_print"`
+	Lat         string                     `json:"lat"`
+	Lon         string                     `json:"lon"`
+	CreatedAt   string                     `json:"created_at"`
+	Labels      []*vision.EntityAnnotation `json:"labels"`
 }
 
 // ResponseMessage represents the response message with a just a string detailing the result
