@@ -1,6 +1,7 @@
 package handler
 
 import (
+	"crypto/tls"
 	"encoding/json"
 	"errors"
 	"net/http"
@@ -108,6 +109,11 @@ func postNewAlertOr500(config *config.Config, url string, w http.ResponseWriter,
 		return nil
 	}
 
+	if err := requestNSFW(alert.ImageURL); err != nil {
+		respondError(w, http.StatusInternalServerError, err.Error())
+		return nil
+	}
+
 	annotate, err := requestIA(config, alert.ImageURL)
 	if err != nil {
 		respondError(w, http.StatusInternalServerError, err.Error())
@@ -122,6 +128,21 @@ func postNewAlertOr500(config *config.Config, url string, w http.ResponseWriter,
 	}
 
 	return &alert
+}
+
+func requestNSFW(url string) error {
+	http.DefaultTransport.(*http.Transport).TLSClientConfig = &tls.Config{InsecureSkipVerify: true}
+	res, err := http.Get("https://177.67.49.218/powerai-vision-ingram/api/dlapis/37b09c6c-f9f0-4edc-9083-6743736ab9be?imageUrl=" + url)
+	if err != nil {
+		return err
+	}
+
+	var data map[string]interface{}
+	if err := json.NewDecoder(res.Body).Decode(&data); err != nil {
+		return err
+	}
+
+	return nil
 }
 
 func requestIA(config *config.Config, url string) (*vision.AnnotateImageResponse, error) {
