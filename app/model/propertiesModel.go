@@ -32,6 +32,7 @@ type Alert struct {
 	FingerPrint string `jsong:"finger_print"`
 	Lat         string `json:"lat"`
 	Lon         string `json:"lon"`
+	CreatedAt   string `json:"created_at"`
 }
 
 // ResponseMessage represents the response message with a just a string detailing the result

@@ -1,10 +1,11 @@
 package handler
 
 import (
-	"bytes"
 	"encoding/json"
 	"net/http"
+	"time"
 
+	firebase "firebase.google.com/go"
 	"github.com/marine/app/model"
 	"github.com/marine/config"
 )
@@ -85,7 +86,7 @@ func requestProperties(target interface{}, url string) error {
 // PostNewAlert  Handlers to save a new alert
 func PostNewAlert(config *config.Config, w http.ResponseWriter, r *http.Request) {
 	config.Logger.Info("Posting new alert")
-	alert := postNewAlertOr500(config.Endpoints.AlertDatabase, w, r)
+	alert := postNewAlertOr500(config.Firebase, config.Endpoints.AlertDatabase, w, r)
 	if alert == nil {
 		config.Logger.Error("Request NOT FOUND")
 		return
@@ -94,34 +95,22 @@ func PostNewAlert(config *config.Config, w http.ResponseWriter, r *http.Request)
 }
 
 // postNewAlertOr500 will post a new alert to the system
-func postNewAlertOr500(url string, w http.ResponseWriter, r *http.Request) *model.Alert {
+func postNewAlertOr500(firebase *firebase.App, url string, w http.ResponseWriter, r *http.Request) *model.Alert {
+	db, err := firebase.Database(r.Context())
+	if err != nil {
+		respondError(w, http.StatusInternalServerError, err.Error())
+		return nil
+	}
 	var alert model.Alert
 	if err := json.NewDecoder(r.Body).Decode(&alert); err != nil {
 		respondError(w, http.StatusInternalServerError, err.Error())
 		return nil
 	}
-	if err := postProperty(&alert, url); err != nil {
+	alert.CreatedAt = time.Now().Format(time.RFC3339)
+	err = db.NewRef("alerts").Set(r.Context(), map[string]model.Alert{alert.CreatedAt: alert})
+	if err != nil {
 		respondError(w, http.StatusInternalServerError, err.Error())
 		return nil
 	}
 	return &alert
-}
-
-// ---------------------------------------------
-// POST REQUEST
-// ---------------------------------------------
-
-func postProperty(target interface{}, url string) error {
-	req, err := http.NewRequest("POST", url, bytes.NewBuffer(parseJSONBytesBuffer(target)))
-	if err != nil {
-		return err
-	}
-	client := &http.Client{}
-	// TODO: save to Firebase
-	r, err := client.Do(req)
-	if err != nil {
-		return err
-	}
-	defer r.Body.Close()
-	return json.NewDecoder(r.Body).Decode(&model.ResponseMessage{Message: "Alerta Enviado com Sucesso !!"})
 }

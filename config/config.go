@@ -38,6 +38,7 @@ func GetConfig() *Config {
 func initializeServiceAccountID() *firebase.App {
 	conf := &firebase.Config{
 		ServiceAccountID: "106364994627247751805@fala-ai-portohacksantos.iam.gserviceaccount.com",
+		DatabaseURL:      "https://fala-ai-portohacksantos.firebaseio.com",
 	}
 	app, err := firebase.NewApp(context.Background(), conf)
 	if err != nil {
